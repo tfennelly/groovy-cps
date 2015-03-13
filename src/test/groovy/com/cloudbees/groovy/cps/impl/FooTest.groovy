@@ -7,16 +7,16 @@ public class FooTest extends AbstractGroovyCpsTest {
 
     @Test
     public void test1() {
-        assert 1==add(2,1);
+        assert 1==compute(2,1);
     }
 
     @Test
     public void callAddFromCps() {
-        assert 3==evalCPSonly("new FooTest().add(2,1)");
+        assert 3==evalCPSonly("new FooTest().compute(2,1)");
     }
 
-    public int add(int a, int b) { // CPS transformed version
-        if (Caller.isAsynchronous(this, "add", a, b)) {
+    public int compute(int a, int b) { // CPS transformed version
+        if (Caller.isAsynchronous(this, "compute", a, b)) {
             throw new CpsCallableInvocation(asyncAdd, this, a, b);
         } else {
             return a-b;
