@@ -26,4 +26,41 @@ public class AsyncCPSCallstackCheckTest extends AbstractGroovyCpsTest {
                     new ConstantBlock("plus"),
                     new LocalVariableBlock("b")
         )));
+
+    @Test
+    public void testNestedCPSCall() {
+        evalCPSonly('''
+
+        ''');
+    }
+
+    public static class Ping {
+        int callCount = 0;
+    }
+
+    public static void ping(Ping p) {
+        p.ping();
+        p.ping();
+    }
+
+    @Test
+    public void testNonEach() {
+        def endCount = evalCPS('''
+            def innerPing = new AsyncCPSCallstackCheckTest.Ping() {
+                  void ping() {
+                    callCount++;
+                  }
+                };
+            AsyncCPSCallstackCheckTest.ping(innerPing);
+            return innerPing.callCount;
+        ''');
+
+        assertEquals(2, endCount);
+    }
+
+
+    @Test
+    public void testEach() {
+
+    }
 }

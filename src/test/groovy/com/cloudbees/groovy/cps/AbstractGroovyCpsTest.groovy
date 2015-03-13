@@ -1,6 +1,7 @@
 package com.cloudbees.groovy.cps
 
 import com.cloudbees.groovy.cps.green.GreenThread
+import com.cloudbees.groovy.cps.impl.Caller
 import com.cloudbees.groovy.cps.impl.CpsCallableInvocation
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
@@ -58,6 +59,7 @@ abstract class AbstractGroovyCpsTest extends Assert {
     CpsCallableInvocation parseCps(String script) {
         Script s = csh.parse(script)
         try {
+            Caller.record(s, "run", new Object[0]);
             s.run();
             fail "Expecting CPS transformation"
         } catch (CpsCallableInvocation inv) {

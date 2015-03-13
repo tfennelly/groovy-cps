@@ -193,7 +193,13 @@ class CpsTransformer extends CompilationCustomizer implements GroovyCodeVisitor 
         def args = new TupleExpression(new VariableExpression(f), THIS);
         m.parameters.each { args.addExpression(new VariableExpression(it)) }
 
-        m.code = new ThrowStatement(new ConstructorCallExpression(CPSCALLINVK_TYPE,args));
+        //m.code = new ThrowStatement(new ConstructorCallExpression(CPSCALLINVK_TYPE,args));
+
+        m.code = new BlockStatement([
+                new ExpressionStatement(new MethodCallExpression(new ConstructorCallExpression(CPSCALLINVK_TYPE,args),
+                        "throwOnAsync", new TupleExpression(new ConstantExpression(m.name)))),
+                m.code
+        ], new VariableScope());
 
         m.addAnnotation(new AnnotationNode(WORKFLOW_TRANSFORMED_TYPE));
     }
