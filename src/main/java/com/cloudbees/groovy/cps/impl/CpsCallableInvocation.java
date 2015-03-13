@@ -41,4 +41,11 @@ public class CpsCallableInvocation extends Error/*not really an error but we wan
             }
         };
     }
+
+    public void throwOnAsync(String methodName) {
+        if (Caller.isAsynchronous(receiver, methodName, arguments)) {
+            throw this;
+        }
+        // fall through.
+    }
 }

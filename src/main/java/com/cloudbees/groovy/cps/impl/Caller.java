@@ -2,6 +2,7 @@ package com.cloudbees.groovy.cps.impl;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 /**
  * As a crude way to distinguish asynchronous caller vs synchronous caller,
@@ -32,10 +33,23 @@ public class Caller {
         return i.receiver != null && receiver==i.receiver.get() && method.equals(i.method) && arrayShallowEquals(i.args, args);
     }
 
+    public static boolean isAsynchronous(Object receiver, String method, List args) {
+        Info i = store.get();
+        return i.receiver != null && receiver==i.receiver.get() && method.equals(i.method) && listShallowEquals(i.args, args);
+    }
+
     private static boolean arrayShallowEquals(Reference<Object>[] a, Object[] b) {
         if (a.length!=b.length)     return false;
         for (int i=0; i<a.length; i++)
             if (a[i].get()!=b[i])
+                return false;
+        return true;
+    }
+
+    private static boolean listShallowEquals(Reference<Object>[] a, List b) {
+        if (a.length!=b.size())     return false;
+        for (int i=0; i<a.length; i++)
+            if (a[i].get()!=b.get(i))
                 return false;
         return true;
     }
