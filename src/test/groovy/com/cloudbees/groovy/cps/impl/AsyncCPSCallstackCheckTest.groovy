@@ -39,15 +39,15 @@ public class AsyncCPSCallstackCheckTest extends AbstractGroovyCpsTest {
     }
 
     public static void ping(Ping p) {
-        p.ping();
-        p.ping();
+        p.pong();
+        p.pong();
     }
 
     @Test
     public void testNonEach() {
         def endCount = evalCPS('''
             def innerPing = new AsyncCPSCallstackCheckTest.Ping() {
-                  void ping() {
+                  void pong() {
                     callCount++;
                   }
                 };
