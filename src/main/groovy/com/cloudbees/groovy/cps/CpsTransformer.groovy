@@ -195,6 +195,8 @@ class CpsTransformer extends CompilationCustomizer implements GroovyCodeVisitor 
             args.addExpression(new VariableExpression(it))
         }
 
+        // transform the method code to be a static call to CpsCallableInvocation.throwOnAsync, followed by
+        // the original method code, which will be executed if CpsCallableInvocation.throwOnAsync falls through.
         m.code = new BlockStatement([
                 new ExpressionStatement(new StaticMethodCallExpression(CPSCALLINVK_TYPE, "throwOnAsync", args)),
                 m.code],
