@@ -21,6 +21,7 @@ public class CpsCallableInvocation extends Error/*not really an error but we wan
     public final Object receiver;
     public final List arguments;
 
+    // TODO: try make this private
     public CpsCallableInvocation(CpsCallable call, Object receiver, Object... arguments) {
         this.call = call;
         this.receiver = receiver;
@@ -42,9 +43,24 @@ public class CpsCallableInvocation extends Error/*not really an error but we wan
         };
     }
 
-    public void throwOnAsync(String methodName) {
+    /**
+     * Throw a {@link CpsCallableInvocation} if and only if (iff) the {@link #receiver} object and target method
+     * signature match the currently recorder CPS {@link Caller} information. Otherwise, fall through and synchronously
+     * execute the transformed method code.
+     *
+     * <p>
+     * Calls {@link Caller#isAsynchronous(Object, String, java.util.List)} to perform the check
+     * described above. If the {@link #receiver} object and target method signature match the currently
+     * recorder {@link Caller} information, then we can fairly safely assume that the caller of the CPS
+     * transformed function (that created this {@link CpsCallableInvocation}) is in fact a CPS
+     * {@code com.cloudbees.groovy.cps.sandbox.Invoker} and not some other Groovy code.
+     *
+     * @see {@link ContinuationGroup#methodCall(com.cloudbees.groovy.cps.Env, SourceLocation, com.cloudbees.groovy.cps.Continuation, Object, String, Object...)}
+     * @see {@link Caller#record(Object, String, Object[])}
+     */
+    public static void throwOnAsync(CpsCallable call, Object receiver, String methodName, Object... arguments) {
         if (Caller.isAsynchronous(receiver, methodName, arguments)) {
-            throw this;
+            throw new CpsCallableInvocation(call, receiver, arguments);
         }
         // fall through.
     }

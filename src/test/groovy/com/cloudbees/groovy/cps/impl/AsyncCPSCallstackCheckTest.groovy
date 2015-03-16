@@ -16,7 +16,7 @@ public class AsyncCPSCallstackCheckTest extends AbstractGroovyCpsTest {
     }
 
     public int compute(int a, int b) { // CPS transformed version
-        new CpsCallableInvocation(asyncAdd, this, a, b).throwOnAsync("compute");
+        CpsCallableInvocation.throwOnAsync(asyncAdd, this, "compute", a, b);
         return a-b;
     }
 
