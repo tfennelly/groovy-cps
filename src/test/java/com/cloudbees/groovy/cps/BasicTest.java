@@ -139,11 +139,11 @@ public class BasicTest extends Assert {
             }
         }
 
-        //  z=5; new Op().compute(1,2)+z   => 8
+        //  z=5; new Op().add(1,2)+z   => 8
         assertEquals(3, run(
-                b.setLocalVariable(0, "z", b.zero()),     // part of the test is to ensure this 'z' is separated from 'z' in the compute function
+                b.setLocalVariable(0, "z", b.zero()),     // part of the test is to ensure this 'z' is separated from 'z' in the add function
                 b.plus(0,
-                        b.functionCall(0, b.constant(new Op()), "compute", b.one(), b.two()),
+                        b.functionCall(0, b.constant(new Op()), "add", b.one(), b.two()),
                         $z)));
     }
 
@@ -234,7 +234,7 @@ public class BasicTest extends Assert {
             }
          */
         assertEquals("hello1", run(
-                b.setLocalVariable(0, "x", b.zero()),     // part of the test is to ensure this 'z' is separated from 'z' in the compute function
+                b.setLocalVariable(0, "x", b.zero()),     // part of the test is to ensure this 'z' is separated from 'z' in the add function
                 b.tryCatch(
                         b.block(
                                 b.setLocalVariable(0, "x", b.one()),
