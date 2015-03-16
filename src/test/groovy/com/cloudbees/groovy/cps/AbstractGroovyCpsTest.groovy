@@ -57,14 +57,19 @@ abstract class AbstractGroovyCpsTest extends Assert {
     }
 
     CpsCallableInvocation parseCps(String script) {
-        Script s = csh.parse(script)
+        Script s = parseAndRecordRunCall(script)
         try {
-            Caller.record(s, "run", new Object[0]);
             s.run();
             fail "Expecting CPS transformation"
         } catch (CpsCallableInvocation inv) {
             return inv;
         }
+    }
+
+    Script parseAndRecordRunCall (String script) {
+        Script s = csh.parse(script)
+        Caller.record(s, "run", new Object[0]);
+        return s;
     }
 
     public <T> T roundtripSerialization(T cx) {

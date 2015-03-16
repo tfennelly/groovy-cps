@@ -1,5 +1,6 @@
 package com.cloudbees.groovy.cps
 
+import com.cloudbees.groovy.cps.impl.Caller
 import org.junit.Test
 
 import java.lang.reflect.InvocationTargetException
@@ -12,7 +13,7 @@ import java.lang.reflect.InvocationTargetException
 class ContinuableTest extends AbstractGroovyCpsTest {
     @Test
     void resumeAndSuspend() {
-        def s = csh.parse("""
+        def s = parseAndRecordRunCall("""
             int x = 1;
             x = Continuable.suspend(x+1)
             return x+1;
@@ -36,7 +37,7 @@ class ContinuableTest extends AbstractGroovyCpsTest {
 
     @Test
     void serializeComplexContinuable() {
-        def s = csh.parse("""
+        def s = parseAndRecordRunCall("""
             def foo(int x) {
                 return Continuable.suspend(x);
             }
@@ -69,7 +70,7 @@ class ContinuableTest extends AbstractGroovyCpsTest {
 
     @Test
     void howComeBindingIsSerializable() {
-        def s = csh.parse("""
+        def s = parseAndRecordRunCall("""
                 Continuable.suspend(42);
                 return value;
 """);
@@ -100,7 +101,7 @@ class ContinuableTest extends AbstractGroovyCpsTest {
      */
     @Test
     void unhandled_exception() {
-        def s = csh.parse("""
+        def s = parseAndRecordRunCall("""
             throw new ${ContinuableTest.class.name}.HelloException()
         """)
         def c = new Continuable(s)
@@ -141,7 +142,7 @@ class ContinuableTest extends AbstractGroovyCpsTest {
      */
     @Test
     void stackTrace() {
-        def s = csh.parse("""
+        def s = parseAndRecordRunCall("""
 
             def x(i,v) {
               if (i>0)
@@ -189,7 +190,7 @@ Script1.run(Script1.groovy:17)
      */
     @Test
     public void staticMethod1() {
-        def s = csh.parse("import static java.lang.Class.forName; forName('java.lang.Integer')")
+        def s = parseAndRecordRunCall("import static java.lang.Class.forName; forName('java.lang.Integer')")
         def c = new Continuable(s);
         def r = c.run(null)
         assert r==Integer.class
@@ -200,7 +201,7 @@ Script1.run(Script1.groovy:17)
      */
     @Test
     public void staticMethod2() {
-        def s = csh.parse("import static java.lang.Integer.toString; toString(31,16)")
+        def s = parseAndRecordRunCall("import static java.lang.Integer.toString; toString(31,16)")
         def c = new Continuable(s);
         def r = c.run(null)
         assert r=="1f"
@@ -211,7 +212,7 @@ Script1.run(Script1.groovy:17)
      */
     @Test
     public void staticMethod0() {
-        def s = csh.parse("import static com.cloudbees.groovy.cps.ContinuableTest.StaticMethodHost.methodWithNoArgs; methodWithNoArgs()")
+        def s = parseAndRecordRunCall("import static com.cloudbees.groovy.cps.ContinuableTest.StaticMethodHost.methodWithNoArgs; methodWithNoArgs()")
         def c = new Continuable(s);
         def r = c.run(null)
         assert r=="hello"
@@ -229,7 +230,7 @@ Script1.run(Script1.groovy:17)
      */
     @Test
     public void concatenate() {
-        def s = csh.parse("""
+        def s = parseAndRecordRunCall("""
             def plus2(i) { return i+2; }
 
             def i=1;
@@ -241,7 +242,7 @@ Script1.run(Script1.groovy:17)
         def c = new Continuable(s);
         assert c.run(null)=="pause1";
 
-        def s2 = csh.parse("""
+        def s2 = parseAndRecordRunCall("""
             return 16+Continuable.suspend("pause2")+32;
         """)
 
@@ -274,7 +275,7 @@ Script1.run(Script1.groovy:17)
 
     @Test
     public void superInterrupt() {
-        def s = csh.parse("""
+        def s = parseAndRecordRunCall("""
             def infiniteLoop() {
                 while (true)
                     ; // infinite loop
